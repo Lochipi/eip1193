@@ -6,8 +6,8 @@ const App = () => {
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
   const [userAccount, setUserAccount] = useState<string>("");
   const [balance, setBalance] = useState<string>("");
-  const [inputAddress, setInputAddress] = useState<string>(""); // Add state for input field
-  const [inputBalance, setInputBalance] = useState<string>(""); // Add state for balance of the input address
+  const [inputAddress, setInputAddress] = useState<string>("");
+  const [inputBalance, setInputBalance] = useState<string>("");
   const providers = useSyncProviders();
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -49,8 +49,7 @@ const App = () => {
         return;
       }
 
-      // Assuming you are using the selected wallet's provider or a default one
-      const provider = selectedWallet?.provider; // Use the selected wallet provider
+      const provider = selectedWallet?.provider;
       if (!provider) {
         setError("No wallet provider connected.");
         return;
@@ -119,12 +118,11 @@ const App = () => {
           />
           <div>{selectedWallet?.info.name}</div>
           <div>({formatAddress(userAccount)})</div>
-          <div>Balance: {balance} ETH</div> {/* Display balance */}
+          <div>Balance: {balance} ETH</div>
         </div>
       )}
       <hr />
 
-      {/* Input field for manually checking balance */}
       <div className="inputAddressBalance">
         <h2>Check Balance for Any Address</h2>
         <input
@@ -135,7 +133,6 @@ const App = () => {
         />
         <button onClick={fetchInputAddressBalance}>Check Balance</button>
 
-        {/* Display input address balance */}
         {inputBalance && (
           <div>
             <strong>Balance:</strong> {inputBalance} ETH
