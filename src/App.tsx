@@ -6,6 +6,8 @@ const App = () => {
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
   const [userAccount, setUserAccount] = useState<string>("");
   const [balance, setBalance] = useState<string>("");
+  const [inputAddress, setInputAddress] = useState<string>(""); // Add state for input field
+  const [inputBalance, setInputBalance] = useState<string>(""); // Add state for balance of the input address
   const providers = useSyncProviders();
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,7 +27,7 @@ const App = () => {
     try {
       const balance = await provider.request({
         method: "eth_getBalance",
-        params: [account, "latest"], // Geting balance at the latest block
+        params: [account, "latest"], // Getting balance at the latest block
       });
       // Converting balance from wei to ether and set it
       const balanceInEther = (
@@ -36,6 +38,37 @@ const App = () => {
     } catch (error) {
       console.error("Error fetching balance:", error);
       setError("Failed to fetch balance");
+    }
+  };
+
+  // Fetch balance based on input address using the selected provider or a default provider (like Infura)
+  const fetchInputAddressBalance = async () => {
+    try {
+      if (!inputAddress) {
+        setError("Please enter a valid address.");
+        return;
+      }
+
+      // Assuming you are using the selected wallet's provider or a default one
+      const provider = selectedWallet?.provider; // Use the selected wallet provider
+      if (!provider) {
+        setError("No wallet provider connected.");
+        return;
+      }
+
+      const balance = await provider.request({
+        method: "eth_getBalance",
+        params: [inputAddress, "latest"],
+      });
+
+      const balanceInEther = (
+        parseInt(balance as string, 16) /
+        10 ** 18
+      ).toFixed(4);
+      setInputBalance(balanceInEther);
+    } catch (error) {
+      console.error("Error fetching balance for input address:", error);
+      setError("Failed to fetch balance for the provided address.");
     }
   };
 
@@ -89,6 +122,27 @@ const App = () => {
           <div>Balance: {balance} ETH</div> {/* Display balance */}
         </div>
       )}
+      <hr />
+
+      {/* Input field for manually checking balance */}
+      <div className="inputAddressBalance">
+        <h2>Check Balance for Any Address</h2>
+        <input
+          type="text"
+          placeholder="Enter Ethereum address"
+          value={inputAddress}
+          onChange={(e) => setInputAddress(e.target.value)}
+        />
+        <button onClick={fetchInputAddressBalance}>Check Balance</button>
+
+        {/* Display input address balance */}
+        {inputBalance && (
+          <div>
+            <strong>Balance:</strong> {inputBalance} ETH
+          </div>
+        )}
+      </div>
+
       <div
         className="mmError"
         style={isError ? { backgroundColor: "brown" } : {}}
